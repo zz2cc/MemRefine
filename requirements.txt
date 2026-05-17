@@ -1,0 +1,13 @@
+torch>=2.0.0
+transformers>=4.30.0
+spacy>=3.6.0
+datasets>=2.14.0
+openai>=1.6.0
+tiktoken>=0.5.0
+numpy
+scipy
+matplotlib
+scikit-learn
+tqdm
+sentence-transformers
+python-dotenv
