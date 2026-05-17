@@ -198,40 +198,6 @@ def plot_experience_growth(
     print(f"[Plot] Experience growth saved to {save_path}")
 
 
-def plot_validation_rate(
-    results: List[Dict],
-    save_path: str = "output/validation_rate.png",
-):
-    """A/B validation pass/fail per dialogue."""
-    labels = []
-    validated_list, discarded_list = [], []
-    for r in results:
-        labels.append(r.get("dialogue_id", "?"))
-        v = sum(h.get("rules_validated", 0) for h in r.get("history", []))
-        d = sum(h.get("rules_discarded", 0) for h in r.get("history", []))
-        validated_list.append(v)
-        discarded_list.append(d)
-
-    fig, ax = plt.subplots(figsize=(10, 5))
-    x = np.arange(len(labels))
-    width = 0.35
-    ax.bar(x - width/2, validated_list, width, label="Validated (kept)", color="#4CAF50", edgecolor="black")
-    ax.bar(x + width/2, discarded_list, width, label="Discarded (failed A/B)", color="#F44336", edgecolor="black")
-    ax.set_xlabel("Dialogue")
-    ax.set_ylabel("Rule Count")
-    ax.set_title("A/B Validation: Rules Kept vs Discarded per Dialogue")
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, rotation=30, ha="right", fontsize=9)
-    ax.legend()
-    ax.grid(True, alpha=0.3, axis="y")
-
-    plt.tight_layout()
-    os.makedirs(os.path.dirname(save_path) if os.path.dirname(save_path) else ".", exist_ok=True)
-    fig.savefig(save_path, bbox_inches="tight")
-    plt.close(fig)
-    print(f"[Plot] Validation rate saved to {save_path}")
-
-
 def plot_weakness_distribution(
     results: List[Dict],
     save_path: str = "output/weakness_distribution.png",
@@ -299,7 +265,6 @@ def plot_summary_dashboard(results: List[Dict], output_dir: str = "output"):
         plot_scores_over_rounds(results, os.path.join(output_dir, "score_trajectory.png"))
         plot_component_breakdown(results, os.path.join(output_dir, "component_breakdown.png"))
         plot_experience_growth(results, os.path.join(output_dir, "experience_growth.png"))
-        plot_validation_rate(results, os.path.join(output_dir, "validation_rate.png"))
         plot_weakness_distribution(results, os.path.join(output_dir, "weakness_distribution.png"))
 
     print(f"\n[Plot] Dashboard complete: {output_dir}/")
@@ -319,8 +284,6 @@ def plot_single_dialogue(result: Dict, output_dir: str):
     ef1 = [s.get("entity_f1", 0) for s in best_scores]
     con = [s.get("consistency", s.get("nli_score", 0)) for s in best_scores]
     lib_sizes = [h.get("experience_count", 0) for h in history]
-    validated = [h.get("rules_validated", 0) for h in history]
-    discarded = [h.get("rules_discarded", 0) for h in history]
 
     # --- Figure 1: Score trajectory + component breakdown ---
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
@@ -350,7 +313,7 @@ def plot_single_dialogue(result: Dict, output_dir: str):
     fig.savefig(os.path.join(output_dir, "trajectory.png"), bbox_inches="tight")
     plt.close(fig)
 
-    # --- Figure 2: Rules growth + A/B validation ---
+    # --- Figure 2: Rules growth + weakness ---
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
     ax1.fill_between(rounds, lib_sizes, alpha=0.3, color="#9C27B0")
@@ -360,16 +323,18 @@ def plot_single_dialogue(result: Dict, output_dir: str):
     ax1.set_title("Experience Library Growth")
     ax1.grid(True, alpha=0.3)
 
-    x = np.arange(len(rounds))
-    w = 0.35
-    ax2.bar(x - w/2, validated, w, label="Validated", color="#4CAF50", edgecolor="black")
-    ax2.bar(x + w/2, discarded, w, label="Discarded", color="#F44336", edgecolor="black")
-    ax2.set_xlabel("Round")
-    ax2.set_ylabel("Rule Count")
-    ax2.set_title("A/B Validation per Round")
-    ax2.set_xticks(x)
-    ax2.set_xticklabels(rounds)
-    ax2.legend()
+    # Weakness per round
+    weakness_map = {"bartscore": "Retention", "retention": "Retention",
+                    "entity_f1": "Entity F1", "nli_score": "Consistency",
+                    "consistency": "Consistency"}
+    weak_counts = {}
+    for h in history:
+        w = weakness_map.get(h.get("weakness", "?"), h.get("weakness", "?"))
+        weak_counts[w] = weak_counts.get(w, 0) + 1
+    ax2.bar(list(weak_counts.keys()), list(weak_counts.values()),
+            color=["#2196F3", "#4CAF50", "#FF9800"][:len(weak_counts)], edgecolor="black")
+    ax2.set_ylabel("Frequency")
+    ax2.set_title("Weakness Distribution")
     ax2.grid(True, alpha=0.3, axis="y")
 
     fig.suptitle(f"Experience Library — {did}", fontsize=14)

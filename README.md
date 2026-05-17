@@ -73,13 +73,12 @@ output/
 │   ├── score_trajectory.png          # 5 色线各自得分轨迹
 │   ├── component_breakdown.png       # 评分三维度分解
 │   ├── experience_growth.png         # 经验库规则数量增长
-│   ├── validation_rate.png           # A/B 验证通过率
 │   └── weakness_distribution.png     # 各维度短板频率
 │
 └── user/                             # 用户模式输出
     ├── results.json                  # 单条对话完整数据
     ├── trajectory.png                # 得分轨迹 + 三维度分解
-    └── library.png                   # 规则增长 + A/B 验证
+    └── library.png                   # 规则增长 + 短板分布
 ```
 
 ## 评分机制

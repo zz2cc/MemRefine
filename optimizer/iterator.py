@@ -200,44 +200,15 @@ class IterationOptimizer:
             # Store for logging
             round_weakness = weakest
 
-            # --- Phase 5: Update experience library (with A/B validation) ---
+            # --- Phase 5: Add rules directly to library ---
             round_delta = round_best_scores["composite"] - prev_round_best
             prev_round_best = round_best_scores["composite"]
 
             rules_added = 0
-            rules_validated = 0
-            rules_discarded = 0
-
-            if self.exp_manager and judge_output and new_rules:
-                # A/B test: generate one candidate WITH all new rules, one WITHOUT
-                test_msgs_with = PromptBuilder.build_generation_messages(
-                    dialogue, experience_entries=new_rules
-                )
-                test_msgs_without = PromptBuilder.build_generation_messages(
-                    dialogue, experience_entries=None
-                )
-                try:
-                    test_with = self.gen_llm.chat(test_msgs_with, temperature=0.7)
-                    score_with = self.compute_enhanced_score(dialogue, test_with)["composite"]
-                    test_without = self.gen_llm.chat(test_msgs_without, temperature=0.7)
-                    score_without = self.compute_enhanced_score(dialogue, test_without)["composite"]
-
-                    improvement = score_with - score_without
-                    if improvement > -0.005:  # tolerate tiny noise, keep if not worse
-                        # Rules improved (or at least didn't hurt) → keep all
-                        for rule in new_rules:
-                            self.exp_manager.library.add(rule, score_delta=round_delta)
-                        rules_added = len(new_rules)
-                        rules_validated = len(new_rules)
-                    else:
-                        # Rules actively hurt → discard all
-                        rules_discarded = len(new_rules)
-                except Exception as e:
-                    # LLM error → keep rules conservatively
-                    for rule in new_rules:
-                        self.exp_manager.library.add(rule, score_delta=0)
-                    rules_added = len(new_rules)
-
+            if self.exp_manager and new_rules:
+                for rule in new_rules:
+                    self.exp_manager.library.add(rule, score_delta=round_delta)
+                rules_added = len(new_rules)
             elif self.exp_manager and judge_output:
                 self.exp_manager.consolidate(judge_output, round_delta)
 
@@ -261,22 +232,18 @@ class IterationOptimizer:
                 "score_spread": round_best_scores["composite"] - round_worst_scores["composite"],
                 "new_rules": new_rules,
                 "rules_added": rules_added,
-                "rules_validated": rules_validated,
-                "rules_discarded": rules_discarded,
                 "judge_output": judge_output,
                 "experience_count": len(self.experience_lib.rules) if self.experience_lib else 0,
                 "round_time_s": round_time,
                 "best_memory": round_best_mem,
                 "weakness": round_weakness,
-                "focus_tags": focus_tags,
             }
             history.append(round_entry)
 
             tag_str = f"→{'+'.join(focus_tags)}" if focus_tags else "→all"
-            val_str = f"+{rules_added}(✓{rules_validated}✗{rules_discarded})" if rules_added else ""
             print(f"  [{dialogue_id}] Round {r}: best={best_score:.4f}, "
                   f"avg={round_avg:.4f}, lib={round_entry['experience_count']} "
-                  f"({val_str}), weak={weakest} {tag_str}, {round_time:.1f}s")
+                  f"(+{rules_added}), weak={weakest} {tag_str}, {round_time:.1f}s")
 
             # Early stopping
             if no_improvement_count >= config.early_stop_patience:
