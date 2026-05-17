@@ -56,7 +56,7 @@ class IterationOptimizer:
         self._evaluators_initialized = True
 
     def compute_enhanced_score(self, dialogue: str, memory: str) -> Dict[str, float]:
-        """AutoMemo: retention (60%) + entity_f1 (20%) + consistency (20%)."""
+        """AutoMemo: retention (70%) + entity_f1 (30%)."""
         self._ensure_evaluators()
 
         am_scores = self.automemo.score(dialogue, memory)
@@ -67,7 +67,7 @@ class IterationOptimizer:
         entities_memory = self.entity_extractor.extract_entities(memory)
         entity_f1 = compute_entity_f1(entities_dialogue, entities_memory)
 
-        composite = 0.60 * retention + 0.20 * entity_f1 + 0.20 * consistency
+        composite = 0.70 * retention + 0.30 * entity_f1
 
         return {
             "composite": composite,
@@ -197,15 +197,25 @@ class IterationOptimizer:
             # Store for logging
             round_weakness = weakest
 
-            # --- Phase 5: Add rules directly to library ---
+            # --- Phase 5: Add rules (capped per round) + DELETE/MODIFY/KEEP ---
             round_delta = round_best_scores["composite"] - prev_round_best
             prev_round_best = round_best_scores["composite"]
 
             rules_added = 0
             if self.experience_lib and new_rules:
+                # Cap: at most N new rules per round for gradual growth
+                max_add = config.rules_per_round_max
                 for rule in new_rules:
-                    self.experience_lib.add(rule, score_delta=round_delta)
-                rules_added = len(new_rules)
+                    if rules_added >= max_add:
+                        break
+                    if self.experience_lib.add(rule, score_delta=round_delta):
+                        rules_added += 1
+
+                # DELETE rules that consistently don't help
+                pruned = self.experience_lib.prune_negative(min_rounds=2)
+
+                # MODIFY: eviction triggers similarity-based merging
+                # KEEP: score_delta + usage_count track rule quality
 
             # --- Track best ---
             if round_best_scores["composite"] > best_score:

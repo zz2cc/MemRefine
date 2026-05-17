@@ -84,7 +84,7 @@ def plot_component_breakdown(
     results: List[Dict],
     save_path: str = "output/component_breakdown.png",
 ):
-    """Per-dialogue component breakdown: retention/entity_f1/consistency trajectories."""
+    """Per-dialogue component breakdown: retention (70%) + entity_f1 (30%)."""
     n = len(results)
     if n == 0:
         return
@@ -105,12 +105,9 @@ def plot_component_breakdown(
         ret = [h.get("best_score", {}).get("retention",
                h.get("best_score", {}).get("bartscore", 0)) for h in history]
         ef1 = [h.get("best_score", {}).get("entity_f1", 0) for h in history]
-        con = [h.get("best_score", {}).get("consistency",
-               h.get("best_score", {}).get("nli_score", 0)) for h in history]
 
-        ax.plot(rounds, ret, "o-", color="#2196F3", linewidth=2, label="Retention")
-        ax.plot(rounds, ef1, "s-", color="#4CAF50", linewidth=2, label="Entity F1")
-        ax.plot(rounds, con, "^-", color="#FF9800", linewidth=2, label="Consistency")
+        ax.plot(rounds, ret, "o-", color="#2196F3", linewidth=2, label="Retention (70%)")
+        ax.plot(rounds, ef1, "s-", color="#4CAF50", linewidth=2, label="Entity F1 (30%)")
         ax.set_title(r.get("dialogue_id", f"dial_{i}"))
         ax.set_xlabel("Round")
         ax.set_ylabel("Score")
@@ -125,17 +122,16 @@ def plot_component_breakdown(
 
     # 6th subplot: aggregate
     ax = axes[5]
-    all_ret, all_ef1, all_con = [], [], []
+    all_ret, all_ef1 = [], []
     for r in results:
         for h in r.get("history", []):
             bs = h.get("best_score", {})
             all_ret.append(bs.get("retention", bs.get("bartscore", 0)))
             all_ef1.append(bs.get("entity_f1", 0))
-            all_con.append(bs.get("consistency", bs.get("nli_score", 0)))
     if all_ret:
-        ax.bar(["Retention", "Entity F1", "Consistency"],
-               [np.mean(all_ret), np.mean(all_ef1), np.mean(all_con)],
-               color=["#2196F3", "#4CAF50", "#FF9800"], edgecolor="black")
+        ax.bar(["Retention (70%)", "Entity F1 (30%)"],
+               [np.mean(all_ret), np.mean(all_ef1)],
+               color=["#2196F3", "#4CAF50"], edgecolor="black")
         ax.set_title("Global Averages")
         ax.set_ylim(0, 1)
         ax.grid(True, alpha=0.3, axis="y")
@@ -282,7 +278,6 @@ def plot_single_dialogue(result: Dict, output_dir: str):
     comp = [s["composite"] for s in best_scores]
     ret = [s.get("retention", s.get("bartscore", 0)) for s in best_scores]
     ef1 = [s.get("entity_f1", 0) for s in best_scores]
-    con = [s.get("consistency", s.get("nli_score", 0)) for s in best_scores]
     lib_sizes = [h.get("experience_count", 0) for h in history]
 
     # --- Figure 1: Score trajectory + component breakdown ---
@@ -298,9 +293,8 @@ def plot_single_dialogue(result: Dict, output_dir: str):
         ax1.annotate(f"{c:.3f}", (r, c), textcoords="offset points", xytext=(0, 12),
                      ha="center", fontsize=10, fontweight="bold")
 
-    ax2.plot(rounds, ret, "o-", color="#2196F3", linewidth=2, label="Retention")
-    ax2.plot(rounds, ef1, "s-", color="#4CAF50", linewidth=2, label="Entity F1")
-    ax2.plot(rounds, con, "^-", color="#FF9800", linewidth=2, label="Consistency")
+    ax2.plot(rounds, ret, "o-", color="#2196F3", linewidth=2, label="Retention (70%)")
+    ax2.plot(rounds, ef1, "s-", color="#4CAF50", linewidth=2, label="Entity F1 (30%)")
     ax2.set_xlabel("Round")
     ax2.set_ylabel("Score")
     ax2.set_title("Component Breakdown")

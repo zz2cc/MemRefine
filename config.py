@@ -25,6 +25,7 @@ class Config:
     experience_max_size: int = 10
     experience_top_n: int = 10
     dedup_threshold: float = 0.8
+    rules_per_round_max: int = 3   # max new rules added per round (gradual growth)
 
     # --- AutoMemo models ---
     nli_model: str = "local_models/roberta-large-mnli"
