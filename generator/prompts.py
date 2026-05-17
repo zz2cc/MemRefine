@@ -32,9 +32,8 @@ rewards: information retention, factual fidelity to the source, and absence of f
 It penalizes: missing key details, invented facts, and content that drifts from the original.
 
 Your analysis should be THOROUGH and MULTI-LEVEL. Identify CONCRETE DIFFERENCES between the
-high and low scoring documents. For each difference you observe, formulate a transferable
-writing rule. Do not limit yourself to a fixed number — output as many rules as the comparison
-genuinely warrants."""
+high and low scoring documents. Output up to 5 of the most impactful writing rules — quality
+over quantity."""
 
     JUDGE_USER_TEMPLATE = """Compare the following two sets of memory documents for the same conversation.
 
@@ -56,7 +55,7 @@ Step 1 — Identify CONCRETE WORD-LEVEL differences:
 - Where does high-score retain the dialogue's own phrasing vs low-score's loose paraphrasing?
 - Which document is more information-dense (more dialogue facts per word)?
 
-Step 2 — For each difference, derive a general writing rule. Output as many rules as you find.
+Step 2 — For each difference, derive a general writing rule. Output up to 5 rules — only the most impactful ones.
 Categorize with [Tag]:
 
 [COMPLETENESS] — rules about capturing ALL key information from the source
