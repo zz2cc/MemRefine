@@ -66,9 +66,11 @@ Categorize with [Tag]:
 Format each rule as:
 [Tag] 请务必[具体做法] 或 [Tag] 注意[避免事项]
 
-Rules should capture WRITING PATTERNS specific to this type of content — concrete enough
-to directly guide the writer, but focused on technique rather than specific entities.
-A good rule teaches HOW to write, not WHAT to write.
+CRITICAL: Rules MUST be abstract and domain-agnostic.
+- Remove ALL specific names, products, locations, numbers — use generic categories.
+- Overly specific rules cause over-reasoning and degrade performance on new inputs.
+- A reader should NOT be able to guess which conversation this rule came from.
+- A good rule teaches HOW to write, not WHAT to write.
 
 Good examples:
 [ACCURACY] 注意不得编造对话中未出现的金额数字或订单号，所有数据必须与原文严格一致

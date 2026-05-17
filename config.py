@@ -16,7 +16,7 @@ class Config:
     llm_max_tokens: int = 2048
 
     # --- Iteration ---
-    num_rounds: int = 5
+    num_rounds: int = 3   # paper shows decline after epoch 3 (over-reasoning)
     candidates_per_round: int = 5
     compare_top_k: int = 2
     compare_bottom_k: int = 2

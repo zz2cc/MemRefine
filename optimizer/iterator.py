@@ -152,8 +152,13 @@ class IterationOptimizer:
         for r in range(rounds):
             round_start = time.time()
 
+            # Temperature annealing: explore (high T) → exploit (low T)
+            # Paper: T=0.7 exploration, T=0.3 inference
+            base_temp = 0.8 - (0.8 - 0.3) * (r / max(rounds - 1, 1))
+
             # --- Phase 1: Generate candidates (with weakness-targeted rules) ---
-            candidates = self.generate_candidates(dialogue, focus_tags=focus_tags)
+            candidates = self.generate_candidates(dialogue, focus_tags=focus_tags,
+                                                   base_temperature=base_temp)
 
             # --- Phase 2: Score all candidates ---
             scored = []
