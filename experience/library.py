@@ -34,7 +34,10 @@ class ExperienceLibrary:
         self.dedup_threshold = dedup_threshold or config.dedup_threshold
         self.rules: List[str] = []
         self.scores: List[float] = []          # performance delta when rule was added
-        self.usage_count: List[int] = []       # how many times each rule has been kept
+        self.usage_count: List[int] = []       # how many rounds this rule survived
+        self.added_round: List[int] = []       # which round was this rule created
+        self.tags: List[str] = []              # extracted tag (COMPLETENESS/ACCURACY/...)
+        self.current_round: int = 0            # current round counter
         self._embedder = None  # lazy load
         self._embeddings: Optional[np.ndarray] = None  # cached embeddings
 
@@ -98,6 +101,12 @@ class ExperienceLibrary:
         self.rules.append(rule)
         self.scores.append(score_delta)
         self.usage_count.append(0)
+        self.added_round.append(self.current_round)
+
+        # Extract tag
+        import re
+        tag_match = re.match(r'\[(ACCURACY|COMPLETENESS|STRUCTURE|STYLE)\]', rule)
+        self.tags.append(tag_match.group(1) if tag_match else "OTHER")
 
         # Update cached embeddings (skip if fallback mode)
         if self._embedder is not None and self._embedder is not False:
@@ -125,7 +134,8 @@ class ExperienceLibrary:
             self.rules.pop(index)
             self.scores.pop(index)
             self.usage_count.pop(index)
-            # Invalidate embeddings cache
+            self.added_round.pop(index)
+            self.tags.pop(index)
             self._embeddings = None
             return True
         return False
@@ -242,11 +252,28 @@ class ExperienceLibrary:
             self._embeddings = None
 
     def mark_survivors(self):
-        """Increment usage_count for all current rules — called each round.
-        Rules that survive more rounds get higher usage_count, making them
-        harder to prune (KEEP effect)."""
+        """Increment usage_count + advance round counter — called each round."""
+        self.current_round += 1
         for i in range(len(self.usage_count)):
             self.usage_count[i] += 1
+
+    def get_evolution_data(self) -> dict:
+        """Return evolution data: tag distribution per round, rule lifespans."""
+        rounds = {}
+        for i in range(len(self.rules)):
+            r = self.added_round[i]
+            t = self.tags[i]
+            rounds.setdefault(r, {}).setdefault(t, 0)
+            rounds[r][t] = rounds[r].get(t, 0) + 1
+        return {
+            "per_round": rounds,
+            "rules": [
+                {"tag": self.tags[i], "added": self.added_round[i],
+                 "survived": self.usage_count[i], "score": self.scores[i],
+                 "text": self.rules[i][:80]}
+                for i in range(len(self.rules))
+            ]
+        }
 
     def prune_negative(self, min_rounds: int = 2) -> int:
         """DELETE: remove rules with negative score_delta that have survived
@@ -260,6 +287,8 @@ class ExperienceLibrary:
             self.rules.pop(i)
             self.scores.pop(i)
             self.usage_count.pop(i)
+            self.added_round.pop(i)
+            self.tags.pop(i)
         if to_remove:
             self._embeddings = None
         return len(to_remove)

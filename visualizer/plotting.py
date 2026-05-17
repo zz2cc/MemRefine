@@ -251,6 +251,55 @@ def plot_weakness_distribution(
     print(f"[Plot] Weakness distribution saved to {save_path}")
 
 
+def plot_rule_evolution(results: List[Dict], save_path: str = "output/rule_evolution.png"):
+    """Stacked area chart: tag distribution evolution across rounds."""
+    from collections import defaultdict
+    import re as _re
+
+    round_tags = defaultdict(lambda: defaultdict(int))
+    for r in results:
+        for h in r.get("history", []):
+            rd = h.get("round", 0)
+            for rule_text in h.get("new_rules", []):
+                tag = _re.match(r'\[(ACCURACY|COMPLETENESS|STRUCTURE|STYLE)\]', rule_text)
+                t = tag.group(1) if tag else "OTHER"
+                round_tags[rd][t] += 1
+
+    if not round_tags:
+        return
+
+    rounds = sorted(round_tags.keys())
+    tag_types = ["COMPLETENESS", "ACCURACY", "STRUCTURE", "STYLE"]
+    colors = {"COMPLETENESS": "#2196F3", "ACCURACY": "#EF5350",
+              "STRUCTURE": "#FF9800", "STYLE": "#9C27B0"}
+
+    data = {t: [round_tags[r].get(t, 0) for r in rounds] for t in tag_types}
+
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+    ax1.stackplot(rounds, [data[t] for t in tag_types],
+                  labels=tag_types, colors=[colors[t] for t in tag_types], alpha=0.8)
+    ax1.set_xlabel("Round"); ax1.set_ylabel("Rule Count")
+    ax1.set_title("Tag Distribution Evolution")
+    ax1.legend(loc="upper left", fontsize=9); ax1.grid(True, alpha=0.3)
+
+    totals = [sum(data[t][i] for t in tag_types) for i in range(len(rounds))]
+    bottom = np.zeros(len(rounds))
+    for t in tag_types:
+        vals = [data[t][i] / max(totals[i], 1) * 100 for i in range(len(rounds))]
+        ax2.bar(rounds, vals, bottom=bottom, label=t, color=colors[t], alpha=0.85, edgecolor="white")
+        bottom += vals
+    ax2.set_xlabel("Round"); ax2.set_ylabel("%")
+    ax2.set_title("Tag Proportion per Round"); ax2.legend(loc="upper right", fontsize=9)
+    ax2.set_ylim(0, 100)
+
+    fig.suptitle("Rule Evolution: How Focus Shifts Across Rounds", fontsize=14)
+    plt.tight_layout()
+    os.makedirs(os.path.dirname(save_path) if os.path.dirname(save_path) else ".", exist_ok=True)
+    fig.savefig(save_path, bbox_inches="tight")
+    plt.close(fig)
+    print(f"[Plot] Rule evolution saved to {save_path}")
+
+
 def plot_summary_dashboard(results: List[Dict], output_dir: str = "output"):
     os.makedirs(output_dir, exist_ok=True)
 
@@ -262,6 +311,7 @@ def plot_summary_dashboard(results: List[Dict], output_dir: str = "output"):
         plot_component_breakdown(results, os.path.join(output_dir, "component_breakdown.png"))
         plot_experience_growth(results, os.path.join(output_dir, "experience_growth.png"))
         plot_weakness_distribution(results, os.path.join(output_dir, "weakness_distribution.png"))
+        plot_rule_evolution(results, os.path.join(output_dir, "rule_evolution.png"))
 
     print(f"\n[Plot] Dashboard complete: {output_dir}/")
 
