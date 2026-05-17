@@ -64,7 +64,8 @@ Categorize with [Tag]:
 [STYLE] — rules about word choice, conciseness, and fidelity to source phrasing
 
 Format each rule as:
-[Tag] 请务必[具体做法] 或 [Tag] 注意[避免事项]
+[Tag] Always [specific practice] or [Tag] Avoid [anti-pattern]
+Write rules in the SAME LANGUAGE as the input text. For English input, write in English.
 
 CRITICAL: Rules MUST be abstract and domain-agnostic.
 - Remove ALL specific names, products, locations, numbers — use generic categories.
@@ -72,10 +73,10 @@ CRITICAL: Rules MUST be abstract and domain-agnostic.
 - A reader should NOT be able to guess which conversation this rule came from.
 - A good rule teaches HOW to write, not WHAT to write.
 
-Good examples:
-[ACCURACY] 注意不得编造对话中未出现的金额数字或订单号，所有数据必须与原文严格一致
-[COMPLETENESS] 请务必记录所有参与方的全名和身份，不可只写模糊称谓
-[STYLE] 注意保留原文中的情绪暗示词和互动细节，不要用中性词替换
+Examples:
+[ACCURACY] Avoid inventing numbers or order IDs not present in the source
+[COMPLETENESS] Always record full names and roles of all participants
+[STYLE] Preserve emotional cues and interaction details from the source text
 
 Now output your analysis and rules:"""
 
@@ -136,10 +137,9 @@ Now output your analysis and rules:"""
         """Parse judge LLM output into a list of experience rules.
 
         Handles multiple formats:
-          [ACCURACY] 请务必[具体做法]
-          [COMPLETENESS] 注意[避免事项]
-          - 请务必[rule]
-          1. 注意[rule]
+          [ACCURACY] Always [practice] / Avoid [anti-pattern]
+          [COMPLETENESS] Always [practice] / Avoid [anti-pattern]
+          - 请务必[rule] / 注意[rule] (legacy Chinese format)
         """
         import re
 
