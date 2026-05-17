@@ -179,16 +179,14 @@ class IterationOptimizer:
             high_avg_score = np.mean([scored[i][1]["composite"] for i in range(high_k)])
             low_avg_score = np.mean([scored[i][1]["composite"] for i in range(-low_k, 0)])
 
-            judge_output = ""
-            new_rules = []
-            if high_avg_score - low_avg_score > 0.01:  # enough spread to be meaningful
-                judge_output, new_rules = self.judge_llm.compare_and_extract(
-                    dialogue=dialogue,
-                    high_memories=high_mems,
-                    low_memories=low_mems,
-                    high_score=high_avg_score,
-                    low_score=low_avg_score,
-                )
+            # Always call judge — even small gaps yield useful rules
+            judge_output, new_rules = self.judge_llm.compare_and_extract(
+                dialogue=dialogue,
+                high_memories=high_mems,
+                low_memories=low_mems,
+                high_score=high_avg_score,
+                low_score=low_avg_score,
+            )
 
             # --- Phase 4: Detect weakness for next round ---
             # Which metric component is the lowest? Target that with matching [Tag] rules.
