@@ -20,12 +20,13 @@ class IterationOptimizer:
     """Orchestrates the full iterative optimization pipeline.
 
     For each dialogue:
-      1. Generate K candidates at varied temperatures
-      2. Score all candidates with enhanced BARTScore
+      1. Generate K candidates (temperature anneals 0.8→0.3 over rounds)
+      2. Score all candidates with AutoMemo (retention 70% + entity_f1 30%)
       3. Select top-N and bottom-N for judge comparison
-      4. Judge extracts writing rules → added to experience library
-      5. Experience library injected into next round's prompt
-      6. Repeat for N rounds
+      4. Judge extracts abstract writing rules (domain-agnostic)
+      5. ADD/DELETE/MODIFY/KEEP operations update experience library
+      6. Experience library injected into next round's prompt
+      7. Repeat for N rounds
     """
 
     def __init__(
