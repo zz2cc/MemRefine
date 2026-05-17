@@ -177,7 +177,7 @@ function start(){
   document.getElementById('results').style.display='none';
   document.getElementById('log').textContent='';
 
-  let body={mode,rounds,candidates:text?parseInt(candidates):5};
+  let body={mode:mode,rounds:parseInt(rounds),candidates:parseInt(cand)};
   if(text) body.text=text;
 
   fetch('/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
@@ -255,8 +255,8 @@ def start_run():
 
     data = request.get_json()
     mode = data.get("mode", "test")
-    rounds = data.get("rounds", 5)
-    candidates = data.get("candidates", 5)
+    rounds = data.get("rounds") or 5
+    candidates = data.get("candidates") or 5
     text = data.get("text", "")
 
     # Write text to temp file if provided (avoids WinError 206)
