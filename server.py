@@ -15,6 +15,11 @@ from utils import parse_file
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024  # 100MB max upload
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cache", "uploads")
+
+@app.after_request
+def no_cache(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    return response
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # Global state
@@ -255,9 +260,10 @@ def start_run():
 
     data = request.get_json()
     mode = data.get("mode", "test")
-    rounds = data.get("rounds") or 5
-    candidates = data.get("candidates") or 5
+    rounds = int(data.get("rounds") or 5)
+    candidates = int(data.get("candidates") or 5)
     text = data.get("text", "")
+    print(f"[RUN] mode={mode} rounds={rounds} candidates={candidates} text_len={len(text)}")
 
     # Write text to temp file if provided (avoids WinError 206)
     tmp_path = None
