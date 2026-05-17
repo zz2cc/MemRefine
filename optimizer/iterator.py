@@ -13,7 +13,6 @@ from generator.prompts import PromptBuilder
 from evaluator.automemo import AutoMemoScorer
 from evaluator.ner import EntityExtractor, compute_entity_f1
 from experience.library import ExperienceLibrary
-from experience.operations import ExperienceManager
 from optimizer.judge import JudgeLLM
 
 
@@ -41,7 +40,6 @@ class IterationOptimizer:
         self.gen_llm = gen_llm
         self.judge_llm = judge_llm
         self.experience_lib = experience_lib
-        self.exp_manager = ExperienceManager(self.experience_lib) if self.experience_lib else None
         self._evaluators_initialized = False
 
     def _ensure_evaluators(self):
@@ -142,7 +140,6 @@ class IterationOptimizer:
         if experience_lib is None:
             experience_lib = ExperienceLibrary()
         self.experience_lib = experience_lib
-        self.exp_manager = ExperienceManager(self.experience_lib)
 
         history = []
         best_memory = None
@@ -205,12 +202,10 @@ class IterationOptimizer:
             prev_round_best = round_best_scores["composite"]
 
             rules_added = 0
-            if self.exp_manager and new_rules:
+            if self.experience_lib and new_rules:
                 for rule in new_rules:
-                    self.exp_manager.library.add(rule, score_delta=round_delta)
+                    self.experience_lib.add(rule, score_delta=round_delta)
                 rules_added = len(new_rules)
-            elif self.exp_manager and judge_output:
-                self.exp_manager.consolidate(judge_output, round_delta)
 
             # --- Track best ---
             if round_best_scores["composite"] > best_score:
