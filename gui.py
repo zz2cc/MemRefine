@@ -253,19 +253,21 @@ class PipelineGUI:
             with open(results_path, "r", encoding="utf-8") as f:
                 self.results_data = json.load(f)
 
-            # Best memory tab
-            best_mem = ""
-            best_score = -1
+            # Best memory tab — show ALL dialogues
+            self.memory_text.config(state=tk.NORMAL)
             for r in self.results_data:
+                did = r.get("dialogue_id", "?")
+                mem = r.get("best_memory", "")
                 score = r.get("best_score", 0)
                 if isinstance(score, dict):
                     score = score.get("composite", 0)
-                if score > best_score:
-                    best_score = score
-                    best_mem = r.get("best_memory", "")
+                traj = r.get("score_trajectory", [])
+                best = max(traj) if traj else score
 
-            self.memory_text.config(state=tk.NORMAL)
-            self.memory_text.insert("1.0", f"Best Score: {best_score:.4f}\n{'─'*60}\n\n{best_mem}")
+                self.memory_text.insert(tk.END,
+                    f"┌─ {did} ─────────────────────────────────────────────\n"
+                    f"│ Score: {best:.4f}  |  Rules: {r.get('experience_count', 0)}\n"
+                    f"└{'─'*60}\n{mem}\n\n\n")
             self.memory_text.config(state=tk.DISABLED)
 
             # Summary tab
