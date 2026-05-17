@@ -399,5 +399,6 @@ if __name__ == "__main__":
     import webbrowser
     port = 8520
     print(f"\n  Opening http://localhost:{port}")
+    print(f"  Press Ctrl+C to stop\n")
     webbrowser.open(f"http://localhost:{port}")
-    app.run(host="127.0.0.1", port=port, debug=False)
+    app.run(host="127.0.0.1", port=port, debug=True, use_reloader=False)
