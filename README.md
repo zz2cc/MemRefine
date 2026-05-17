@@ -40,16 +40,14 @@ JUDGE_API_KEY=sk-your-judge-key-here
 
 ## 运行
 
-### GUI（推荐）
+### Web 界面（推荐）
 
 ```bash
-python server.py
+python server.py        # 或双击 start.bat
 ```
 
-- Test 模式：对 5 条内置英文对话运行迭代优化
-- User 模式：输入单条对话文本或从文件加载
-- 实时显示进度日志，完成后自动切换到结果标签页
-- 结果标签页：最优记忆文本 / 输出文件（双击打开）/ 得分汇总 / 学到的规则
+浏览器打开 `http://localhost:8520`。
+支持拖拽上传 PDF/PPTX/DOCX 等 8 种格式，实时日志，结果面板。
 
 ### 命令行
 
