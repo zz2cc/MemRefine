@@ -43,7 +43,7 @@ JUDGE_API_KEY=sk-your-judge-key-here
 ### GUI（推荐）
 
 ```bash
-python gui.py
+python server.py
 ```
 
 - Test 模式：对 5 条内置英文对话运行迭代优化
@@ -97,7 +97,7 @@ output/
 
 ```
 ├── main.py              # 命令行入口
-├── gui.py               # GUI 入口（Tkinter）
+├── server.py            # Web 界面入口
 ├── config.py            # 配置
 ├── _ssl_patch.py        # SSL 证书修复（受限网络环境用）
 ├── evaluator/
