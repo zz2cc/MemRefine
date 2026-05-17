@@ -28,7 +28,7 @@ run_state = {"running": False, "queue": queue.Queue(), "process": None}
 HTML = r"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>MemRefine</title>
+<title>MemRefine · 迭代式记忆精炼</title>
 <style>
 :root{--bg:#f8fafc;--card:#fff;--accent:#6366f1;--green:#10b981;--red:#ef4444;--orange:#f59e0b;--text:#1e293b;--muted:#94a3b8;--border:#e2e8f0;--radius:12px}
 *{box-sizing:border-box;margin:0;padding:0}
