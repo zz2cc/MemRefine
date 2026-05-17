@@ -60,3 +60,64 @@ def format_duration(seconds: float) -> str:
     minutes = int(seconds // 60)
     secs = seconds % 60
     return f"{minutes}m {secs:.0f}s"
+
+
+# ── File parser (for web upload) ──────────────────────────
+
+def parse_file(filepath: str):
+    """Auto-detect format and extract text. Returns None if unsupported."""
+    ext = os.path.splitext(filepath)[1].lower()
+    parsers = {
+        ".txt": lambda p: _read(p), ".md": lambda p: _read(p),
+        ".csv": _parse_csv, ".json": _parse_json, ".xml": _read,
+        ".pdf": _parse_pdf, ".pptx": _parse_pptx, ".docx": _parse_docx,
+    }
+    parser = parsers.get(ext)
+    if not parser:
+        return None
+    try:
+        return parser(filepath)
+    except Exception as e:
+        return f"[Error reading {ext}: {e}]"
+
+
+def _read(path):
+    with open(path, "r", encoding="utf-8", errors="surrogateescape") as f:
+        return f.read()
+
+
+def _parse_csv(path):
+    import csv, io
+    with open(path, "r", encoding="utf-8", errors="replace") as f:
+        return "\n".join(" | ".join(row) for row in csv.reader(f))
+
+
+def _parse_json(path):
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    if isinstance(data, (dict, list)):
+        if isinstance(data, dict) and ("dialogue" in data or "text" in data):
+            return data.get("dialogue") or data.get("text", "")
+        return json.dumps(data, ensure_ascii=False, indent=2)
+    return str(data)
+
+
+def _parse_pdf(path):
+    from PyPDF2 import PdfReader
+    return "\n\n".join(p.extract_text() or "" for p in PdfReader(path).pages)
+
+
+def _parse_pptx(path):
+    from pptx import Presentation
+    slides = []
+    for i, slide in enumerate(Presentation(path).slides, 1):
+        texts = [t for shape in slide.shapes if shape.has_text_frame
+                 for para in shape.text_frame.paragraphs if (t := para.text.strip())]
+        if texts:
+            slides.append(f"## Slide {i}\n" + "\n".join(texts))
+    return "\n\n".join(slides)
+
+
+def _parse_docx(path):
+    from docx import Document
+    return "\n\n".join(p.text for p in Document(path).paragraphs if p.text.strip())

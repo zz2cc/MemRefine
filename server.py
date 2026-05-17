@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from flask import Flask, request, jsonify, Response, render_template_string
 from werkzeug.utils import secure_filename
-from utils.file_parser import parse_file
+from utils import parse_file
 
 app = Flask(__name__)
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cache", "uploads")
