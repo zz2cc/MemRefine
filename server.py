@@ -237,6 +237,25 @@ function onDone(){
     (data.files||[]).forEach(f=>{
       filesDiv.innerHTML+=`<a class="file-link" href="/output/${f}" target="_blank">📄 ${f}</a>`;
     });
+
+    // Evolution summary
+    if(data.evolution){
+      let evoDiv=document.getElementById('evolution-content')||document.createElement('div');
+      evoDiv.id='evolution-content';
+      evoDiv.innerHTML='<h4 style="margin-top:12px">Rule Evolution</h4>';
+      let tags=['COMPLETENESS','ACCURACY','STRUCTURE','STYLE'];
+      let colors={COMPLETENESS:'#2196F3',ACCURACY:'#EF5350',STRUCTURE:'#FF9800',STYLE:'#9C27B0'};
+      for(let [round,counts] of Object.entries(data.evolution)){
+        evoDiv.innerHTML+=`<div style="margin:4px 0"><b>Round ${round}:</b> `;
+        tags.forEach(t=>{
+          let c=counts[t]||0;
+          if(c>0) evoDiv.innerHTML+=`<span style="background:${colors[t]};color:#fff;padding:2px 8px;border-radius:4px;margin:0 4px;font-size:12px">${t}: ${c}</span>`;
+        });
+        evoDiv.innerHTML+=`</div>`;
+      }
+      let rulesDiv=document.getElementById('rules-content');
+      if(rulesDiv) rulesDiv.appendChild(evoDiv);
+    }
   });
 }
 
@@ -380,7 +399,22 @@ def get_results():
     if os.path.isdir(output_dir):
         files = sorted(os.listdir(output_dir))
 
-    return jsonify({"results": results_data, "rules": rules_data, "files": files})
+    # Evolution summary
+    from collections import defaultdict
+    evolution = defaultdict(lambda: defaultdict(int))
+    for r in results_data:
+        for h in r.get("history", []):
+            rd = h.get("round", 0)
+            for rule_text in h.get("new_rules", []):
+                import re
+                tag = re.match(r'\[(ACCURACY|COMPLETENESS|STRUCTURE|STYLE)\]', rule_text)
+                t = tag.group(1) if tag else "OTHER"
+                evolution[str(rd)][t] += 1
+
+    return jsonify({
+        "results": results_data, "rules": rules_data, "files": files,
+        "evolution": {k: dict(v) for k, v in sorted(evolution.items())}
+    })
 
 
 @app.route("/output/<path:filename>")
