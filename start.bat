@@ -25,11 +25,10 @@ if errorlevel 1 (
 )
 
 echo.
-echo Starting server at http://localhost:8520
+echo Starting server — browser will open automatically
 echo Close this window to stop.
 echo ============================================
 echo.
 
-start "" http://localhost:8520
 "%PYTHON%" server.py
 pause
