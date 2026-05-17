@@ -20,7 +20,7 @@ def _load_dotenv():
                 line = line.strip()
                 if line and not line.startswith("#") and "=" in line:
                     key, _, val = line.partition("=")
-                    os.environ.setdefault(key.strip(), val.strip())
+                    os.environ[key.strip()] = val.strip()  # force override, not setdefault
 _load_dotenv()
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

@@ -261,8 +261,9 @@ def start_run():
 
     # Write text to temp file if provided (avoids WinError 206)
     tmp_path = None
-    if text:
+    if text and mode != "test":
         tmp_path = os.path.join(UPLOAD_DIR, "_input.txt")
+        tmp_path = os.path.abspath(tmp_path)
         with open(tmp_path, "w", encoding="utf-8", errors="surrogateescape") as f:
             f.write(text)
 
