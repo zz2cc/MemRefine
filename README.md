@@ -71,8 +71,7 @@ output/
 │   ├── score_trajectory.png          # 5 色线各自得分轨迹
 │   ├── component_breakdown.png       # 评分三维度分解
 │   ├── experience_growth.png         # 经验库规则数量增长
-│   ├── weakness_distribution.png     # 各维度短板频率
-│   └── rule_evolution.png            # 规则演化：标签分布随轮次迁移
+│   └── weakness_distribution.png     # 各维度短板频率
 │
 └── user/                             # 用户模式输出
     ├── results.json                  # 单条对话完整数据

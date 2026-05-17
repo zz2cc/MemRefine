@@ -303,9 +303,6 @@ def plot_rule_evolution(results: List[Dict], save_path: str = "output/rule_evolu
 def plot_summary_dashboard(results: List[Dict], output_dir: str = "output"):
     os.makedirs(output_dir, exist_ok=True)
 
-    # Always generate evolution chart
-    plot_rule_evolution(results, os.path.join(output_dir, "rule_evolution.png"))
-
     if len(results) == 1:
         plot_single_dialogue(results[0], output_dir)
     else:
