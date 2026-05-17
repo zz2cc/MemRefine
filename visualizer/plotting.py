@@ -303,15 +303,16 @@ def plot_rule_evolution(results: List[Dict], save_path: str = "output/rule_evolu
 def plot_summary_dashboard(results: List[Dict], output_dir: str = "output"):
     os.makedirs(output_dir, exist_ok=True)
 
+    # Always generate evolution chart
+    plot_rule_evolution(results, os.path.join(output_dir, "rule_evolution.png"))
+
     if len(results) == 1:
-        # Single dialogue — simplified plots
         plot_single_dialogue(results[0], output_dir)
     else:
         plot_scores_over_rounds(results, os.path.join(output_dir, "score_trajectory.png"))
         plot_component_breakdown(results, os.path.join(output_dir, "component_breakdown.png"))
         plot_experience_growth(results, os.path.join(output_dir, "experience_growth.png"))
         plot_weakness_distribution(results, os.path.join(output_dir, "weakness_distribution.png"))
-        plot_rule_evolution(results, os.path.join(output_dir, "rule_evolution.png"))
 
     print(f"\n[Plot] Dashboard complete: {output_dir}/")
 
