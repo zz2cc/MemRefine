@@ -13,6 +13,7 @@ from werkzeug.utils import secure_filename
 from utils import parse_file
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024  # 100MB max upload
 UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "cache", "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -141,25 +142,27 @@ document.getElementById('file-input').onchange=e=>handleFiles(e.target.files);
 
 async function handleFiles(files){
   uploadedFiles=[];
+  fi.textContent='Processing...';
   for(let f of files){
-    let text=await readFile(f);
-    uploadedFiles.push({name:f.name,text:text});
+    try{
+      let formData=new FormData();
+      formData.append('file',f);
+      let resp=await fetch('/upload',{method:'POST',body:formData});
+      let data=await resp.json();
+      if(data.ok){
+        uploadedFiles.push({name:data.name,text:data.text});
+        fi.textContent=uploadedFiles.map(x=>`${x.name} (${(x.text.length/1024).toFixed(1)} KB)`).join(', ');
+        dz.classList.add('has-file');
+      }else{
+        fi.textContent='Error: '+data.error;
+      }
+    }catch(e){
+      fi.textContent='Upload failed: '+e.message;
+    }
   }
   if(uploadedFiles.length){
-    fi.textContent=uploadedFiles.map(f=>`${f.name} (${(f.text.length/1024).toFixed(1)} KB)`).join(', ');
-    dz.classList.add('has-file');
-    let combined=uploadedFiles.map(f=>f.text).join('\n\n');
-    document.getElementById('text-input').value=combined;
+    document.getElementById('text-input').value=uploadedFiles.map(f=>f.text).join('\n\n');
   }
-}
-
-function readFile(file){
-  return new Promise(resolve=>{
-    let reader=new FileReader();
-    reader.onload=e=>resolve(e.target.result);
-    if(file.name.match(/\.(txt|md|csv|json|xml)$/i)) reader.readAsText(file);
-    else reader.readAsText(file);
-  });
 }
 
 function start(){
@@ -317,6 +320,26 @@ def stream_log():
             except queue.Empty:
                 yield f"data: \n\n"
     return Response(generate(), mimetype="text/event-stream")
+
+
+@app.route("/upload", methods=["POST"])
+def upload_file():
+    """Handle file upload — save to disk and extract text via parse_file."""
+    if "file" not in request.files:
+        return jsonify({"error": "No file"}), 400
+    f = request.files["file"]
+    if f.filename == "":
+        return jsonify({"error": "Empty filename"}), 400
+
+    ext = os.path.splitext(f.filename)[1].lower()
+    path = os.path.join(UPLOAD_DIR, secure_filename(f.filename))
+    f.save(path)
+
+    text = parse_file(path)
+    if text is None:
+        return jsonify({"error": f"Unsupported format: {ext}"}), 400
+
+    return jsonify({"ok": True, "text": text, "name": f.filename, "size": len(text)})
 
 
 @app.route("/results")
