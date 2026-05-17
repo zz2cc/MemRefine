@@ -185,15 +185,15 @@ def cmd_user(args):
 # ── Dry run ────────────────────────────────────────────────────
 def cmd_dry_run(args):
     print("\n" + "=" * 60)
-    print("DRY RUN — AutoMemo evaluator test (no LLM)")
+    print("DRY RUN — Hybrid evaluator test (no LLM)")
     print("=" * 60)
 
     from data.dialog_data import create_sample_dataset
-    from evaluator.automemo import AutoMemoScorer
+    from evaluator.hybrid_scorer import HybridScorer
     from evaluator.ner import EntityExtractor, compute_entity_f1
 
     dataset = create_sample_dataset(n=2)
-    scorer = AutoMemoScorer()
+    scorer = HybridScorer()
     ner = EntityExtractor()
 
     for d in dataset:
@@ -210,7 +210,7 @@ def cmd_dry_run(args):
         print(f"  Consistency: {scores['consistency']:.4f}")
         print(f"  Composite: {scores['composite']:.4f}")
 
-    print("\n[Dry run] AutoMemo evaluator OK.")
+    print("\n[Dry run] Hybrid evaluator OK.")
 
 
 # ── Main ───────────────────────────────────────────────────────

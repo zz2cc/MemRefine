@@ -15,17 +15,17 @@ from sentence_transformers import SentenceTransformer
 from config import config
 
 
-class AutoMemoScorer:
+class HybridScorer:
     """Fast hybrid scorer: embeddings for retention, NLI for contradiction."""
 
     def __init__(self, nli_model: str = None, embed_model: str = None):
         nli_model = nli_model or config.nli_model
         embed_model = embed_model or config.embedding_model
 
-        print(f"[AutoMemo] Loading embedder {embed_model} ...")
+        print(f"[Scorer] Loading embedder {embed_model} ...")
         self.embedder = SentenceTransformer(embed_model, device="cpu")
 
-        print(f"[AutoMemo] Loading NLI {nli_model} ...")
+        print(f"[Scorer] Loading NLI {nli_model} ...")
         self.nli_tokenizer = AutoTokenizer.from_pretrained(nli_model)
         self.nli_model = AutoModelForSequenceClassification.from_pretrained(nli_model)
         self.nli_model.eval()

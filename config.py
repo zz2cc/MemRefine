@@ -27,7 +27,7 @@ class Config:
     dedup_threshold: float = 0.8
     rules_per_round_max: int = 3   # max new rules added per round (gradual growth)
 
-    # --- AutoMemo models ---
+    # --- scoring models ---
     nli_model: str = "local_models/roberta-large-mnli"
     embedding_model: str = "local_models/all-MiniLM-L6-v2"
 

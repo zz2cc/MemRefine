@@ -10,7 +10,7 @@ from tqdm import tqdm
 from config import config
 from generator.llm_client import LLMClient
 from generator.prompts import PromptBuilder
-from evaluator.automemo import AutoMemoScorer
+from evaluator.hybrid_scorer import HybridScorer
 from evaluator.ner import EntityExtractor, compute_entity_f1
 from experience.library import ExperienceLibrary
 from optimizer.judge import JudgeLLM
@@ -21,7 +21,7 @@ class IterationOptimizer:
 
     For each dialogue:
       1. Generate K candidates (temperature anneals 0.8→0.3 over rounds)
-      2. Score all candidates with AutoMemo (retention 70% + entity_f1 30%)
+      2. Score all candidates with Hybrid scoring (retention 70% + entity_f1 30%)
       3. Select top-N and bottom-N for judge comparison
       4. Judge extracts abstract writing rules (domain-agnostic)
       5. ADD/DELETE/MODIFY/KEEP operations update experience library
@@ -47,7 +47,7 @@ class IterationOptimizer:
         if self._evaluators_initialized:
             return
         if self.automemo is None:
-            self.automemo = AutoMemoScorer()
+            self.automemo = HybridScorer()
         if self.entity_extractor is None:
             self.entity_extractor = EntityExtractor()
         if self.gen_llm is None:
@@ -57,7 +57,7 @@ class IterationOptimizer:
         self._evaluators_initialized = True
 
     def compute_enhanced_score(self, dialogue: str, memory: str) -> Dict[str, float]:
-        """AutoMemo: retention (70%) + entity_f1 (30%)."""
+        """HybridScorer: retention (70%) + entity_f1 (30%)."""
         self._ensure_evaluators()
 
         am_scores = self.automemo.score(dialogue, memory)
