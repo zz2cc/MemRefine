@@ -241,11 +241,16 @@ class ExperienceLibrary:
             self.usage_count.pop(worst_idx)
             self._embeddings = None
 
-    def prune_negative(self, min_rounds: int = 2) -> int:
-        """Delete rules with negative score_delta that have been in the library
-        for at least min_rounds (indicated by usage_count >= min_rounds).
+    def mark_survivors(self):
+        """Increment usage_count for all current rules — called each round.
+        Rules that survive more rounds get higher usage_count, making them
+        harder to prune (KEEP effect)."""
+        for i in range(len(self.usage_count)):
+            self.usage_count[i] += 1
 
-        Returns number of rules removed.
+    def prune_negative(self, min_rounds: int = 2) -> int:
+        """DELETE: remove rules with negative score_delta that have survived
+        at least min_rounds without contributing. Returns count removed.
         """
         to_remove = [
             i for i in range(len(self.rules))

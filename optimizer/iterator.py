@@ -197,13 +197,19 @@ class IterationOptimizer:
             # Store for logging
             round_weakness = weakest
 
-            # --- Phase 5: Add rules (capped per round) + DELETE/MODIFY/KEEP ---
+            # --- Phase 5: ADD/DELETE/MODIFY/KEEP ---
             round_delta = round_best_scores["composite"] - prev_round_best
             prev_round_best = round_best_scores["composite"]
 
             rules_added = 0
-            if self.experience_lib and new_rules:
-                # Cap: at most N new rules per round for gradual growth
+            if self.experience_lib:
+                # KEEP: mark rules that survived this round
+                self.experience_lib.mark_survivors()
+
+                # DELETE: remove rules with negative impact over 2+ rounds
+                pruned = self.experience_lib.prune_negative(min_rounds=2)
+
+                # ADD: new rules, capped for gradual growth
                 max_add = config.rules_per_round_max
                 for rule in new_rules:
                     if rules_added >= max_add:
@@ -211,11 +217,8 @@ class IterationOptimizer:
                     if self.experience_lib.add(rule, score_delta=round_delta):
                         rules_added += 1
 
-                # DELETE rules that consistently don't help
-                pruned = self.experience_lib.prune_negative(min_rounds=2)
-
-                # MODIFY: eviction triggers similarity-based merging
-                # KEEP: score_delta + usage_count track rule quality
+                # MODIFY: add() internally calls _evict_if_needed() which
+                # merges similar rules when library hits max_size
 
             # --- Track best ---
             if round_best_scores["composite"] > best_score:
