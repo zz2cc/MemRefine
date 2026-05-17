@@ -1,5 +1,5 @@
 @echo off
-title Memory Pipeline
+title MemRefine
 cd /d "%~dp0"
 
 echo ============================================

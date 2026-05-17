@@ -1,4 +1,4 @@
-# Iterative Memory Optimization via Self-Comparison
+# MemRefine — Iterative Memory Optimization via Self-Comparison
 
 通过多轮自我对比迭代，在不重新训练 LLM 的前提下提升文本摘要 / 记忆文档的生成质量。
 

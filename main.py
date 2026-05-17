@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Iterative Memory Optimization via Self-Comparison.
+"""MemRefine — Iterative Memory Optimization via Self-Comparison.
 
 Two modes:
   python main.py --mode test                # run on 5 built-in test dialogues
@@ -36,7 +36,7 @@ from visualizer.plotting import plot_summary_dashboard, print_summary_table
 
 
 def parse_args():
-    p = argparse.ArgumentParser(description="Iterative Memory Optimization via Self-Comparison")
+    p = argparse.ArgumentParser(description="MemRefine — Iterative Memory Optimization via Self-Comparison")
     p.add_argument("--mode", type=str, default="test", choices=["test", "user"],
                    help="test=5 built-in dialogues | user=single dialogue from --text/--file")
     p.add_argument("--text", type=str, default=None,

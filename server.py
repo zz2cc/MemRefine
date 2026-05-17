@@ -1,4 +1,4 @@
-"""Web-based GUI for the Memory Optimization Pipeline.
+"""Web-based GUI for the MemRefine.
 
 Usage: python server.py
 Opens browser at http://localhost:8520
@@ -28,7 +28,7 @@ run_state = {"running": False, "queue": queue.Queue(), "process": None}
 HTML = r"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Memory Optimization Pipeline</title>
+<title>MemRefine</title>
 <style>
 :root{--bg:#f8fafc;--card:#fff;--accent:#6366f1;--green:#10b981;--red:#ef4444;--orange:#f59e0b;--text:#1e293b;--muted:#94a3b8;--border:#e2e8f0;--radius:12px}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -73,7 +73,7 @@ textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:14p
 </head>
 <body>
 <div class="header">
-  <h1>Memory Optimization Pipeline</h1>
+  <h1>MemRefine</h1>
   <p>Iterative self-comparison for better document summarization</p>
 </div>
 <div class="container">
