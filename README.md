@@ -85,9 +85,9 @@ output/
 
 | 维度 | 权重 | 方法 | 测什么 |
 |------|------|------|--------|
-| Retention | 50% | MiniLM 嵌入余弦相似度 | 记忆覆盖了对话中多少信息 |
-| Entity F1 | 25% | spaCy NER 实体匹配 | 人名/数字/日期是否丢失 |
-| Consistency | 25% | RoBERTa NLI 矛盾检测 | 记忆是否编造了不存在的内容 |
+| Retention | 60% | MiniLM 嵌入余弦相似度 | 记忆覆盖了对话中多少信息 |
+| Entity F1 | 20% | spaCy NER 实体匹配 | 人名/数字/日期是否丢失 |
+| Consistency | 20% | RoBERTa NLI 矛盾检测 | 记忆是否编造了不存在的内容 |
 
 ## 当前局限
 

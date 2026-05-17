@@ -56,7 +56,7 @@ class IterationOptimizer:
         self._evaluators_initialized = True
 
     def compute_enhanced_score(self, dialogue: str, memory: str) -> Dict[str, float]:
-        """AutoMemo: retention (50%) + entity_f1 (25%) + consistency (25%)."""
+        """AutoMemo: retention (60%) + entity_f1 (20%) + consistency (20%)."""
         self._ensure_evaluators()
 
         am_scores = self.automemo.score(dialogue, memory)
