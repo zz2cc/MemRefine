@@ -67,7 +67,7 @@ class IterationOptimizer:
         entities_memory = self.entity_extractor.extract_entities(memory)
         entity_f1 = compute_entity_f1(entities_dialogue, entities_memory)
 
-        composite = 0.50 * retention + 0.25 * entity_f1 + 0.25 * consistency
+        composite = 0.60 * retention + 0.20 * entity_f1 + 0.20 * consistency
 
         return {
             "composite": composite,
