@@ -9,15 +9,15 @@ Generate K candidates → Hybrid scorer ranks them → Judge compares high vs lo
 
 ## Demo
 
-**Test mode** · 5 dialogues running 5 rounds each · 5 条对话各 5 轮：
+**Test mode** (5 dialogues × 5 rounds):
 
-| Component Breakdown · 成分分解 | Experience Growth · 经验库增长 |
+| Component Breakdown | Experience Growth |
 |---|---|
 | ![breakdown](assets/demo_breakdown.png) | ![growth](assets/demo_growth.png) |
 
-**User mode** · single dialogue · 单条对话：
+**User mode** (single dialogue):
 
-| Score Trajectory · 得分轨迹 | Library Growth · 规则增长 |
+| Score Trajectory | Library Growth |
 |---|---|
 | ![trajectory](assets/demo_trajectory.png) | ![library](assets/demo_library.png) |
 
