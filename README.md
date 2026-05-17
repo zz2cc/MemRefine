@@ -9,12 +9,17 @@ Generate K candidates → Hybrid scorer ranks them → Judge compares high vs lo
 
 ## Demo
 
-| Score Trajectory | Library Growth |
+**Test mode** · 5 dialogues running 5 rounds each · 5 条对话各 5 轮：
+
+| Component Breakdown · 成分分解 | Experience Growth · 经验库增长 |
+|---|---|
+| ![breakdown](assets/demo_breakdown.png) | ![growth](assets/demo_growth.png) |
+
+**User mode** · single dialogue · 单条对话：
+
+| Score Trajectory · 得分轨迹 | Library Growth · 规则增长 |
 |---|---|
 | ![trajectory](assets/demo_trajectory.png) | ![library](assets/demo_library.png) |
-
-- **Left**: Composite score (black) across rounds, Retention (blue) + Entity F1 (green) breakdown
-- **Right**: Rules in experience library (purple) + weakness distribution (bars)
 
 ## Quick Start
 
@@ -167,12 +172,17 @@ output/
 
 ## 效果演示
 
-| 得分轨迹 | 经验库增长 |
+**测试模式** · 5 条对话各迭代 5 轮：
+
+| 成分分解 | 经验库增长 |
+|---|---|
+| ![breakdown](assets/demo_breakdown.png) | ![growth](assets/demo_growth.png) |
+
+**用户模式** · 单条对话：
+
+| 得分轨迹 | 规则增长 |
 |---|---|
 | ![trajectory](assets/demo_trajectory.png) | ![library](assets/demo_library.png) |
-
-- **左图**：Composite 得分（黑线）随轮次变化，Retention 信息保留率（蓝）+ Entity F1 实体覆盖（绿）
-- **右图**：经验库规则数量（紫线）+ 短板分布（柱状图）
 
 ## 快速开始
 
