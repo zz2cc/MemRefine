@@ -18,10 +18,10 @@ class EntityExtractor:
         try:
             self.nlp = spacy.load(spacy_model)
         except OSError:
-            print(f"    Model '{spacy_model}' not found, downloading...")
-            import subprocess
-            subprocess.run(["python", "-m", "spacy", "download", spacy_model], check=True)
-            self.nlp = spacy.load(spacy_model)
+            print(f"    Model '{spacy_model}' not found.")
+            print(f"    Run: python -m spacy download {spacy_model}")
+            print(f"    Entity extraction disabled — scores will be 0.")
+            self.nlp = None
 
         # Entity types we care about (people, orgs, locations, dates, numbers, products)
         self.relevant_types = {"PERSON", "ORG", "GPE", "LOC", "DATE", "TIME",
@@ -30,6 +30,8 @@ class EntityExtractor:
 
     def extract_entities(self, text: str) -> Set[str]:
         """Extract named entities from text, returning set of normalized entity strings."""
+        if self.nlp is None:
+            return set()
         doc = self.nlp(text[:100000])  # truncate for safety
         entities = set()
         for ent in doc.ents:
@@ -40,6 +42,8 @@ class EntityExtractor:
 
     def extract_entities_by_type(self, text: str) -> dict:
         """Extract entities grouped by NER type."""
+        if self.nlp is None:
+            return {}
         doc = self.nlp(text[:100000])
         grouped = {}
         for ent in doc.ents:

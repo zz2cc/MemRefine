@@ -159,7 +159,11 @@ class PipelineGUI:
             rounds = self.rounds_var.get()
             cand = self.cand_var.get()
 
-            cmd = [sys.executable, "main.py", "--rounds", str(rounds), "--candidates", str(cand)]
+            # Use Python 3.12 (which has all deps), not Anaconda
+            python_exe = r"C:\Users\z2cc_\AppData\Local\Programs\Python\Python312\python.exe"
+            if not os.path.exists(python_exe):
+                python_exe = sys.executable
+            cmd = [python_exe, "main.py", "--rounds", str(rounds), "--candidates", str(cand)]
 
             if mode == "test":
                 cmd += ["--mode", "test"]
