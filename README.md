@@ -83,8 +83,7 @@ Optional: `--rounds 5` `--candidates 5` `--model deepseek-chat`
 | Retention | 70% | MiniLM embedding cosine similarity | How much source content is covered |
 | Entity F1 | 30% | spaCy NER match | Are names/numbers/dates preserved |
 
-Embedding similarity is the text analogue of CLIP scoring in 3DrawAgent — fast (0.05s), interpretable.
-Entity F1 catches what embeddings miss: "order #88421" → "the order" loses critical detail.
+Embedding similarity measures how well the memory semantically covers each fact in the source — fast (~0.05s per eval), interpretable, and language-agnostic within the same model. Entity F1 catches what embeddings miss: "order #88421" → "the order" loses critical detail.
 
 ## Core Mechanism
 
@@ -156,7 +155,6 @@ output/
 
 **Supported file formats?** PDF, PPTX, DOCX, CSV, JSON, XML, TXT, MD. Drag-drop in Web UI.
 
-**Use for lecture notes?** Yes, `--mode user` with PPT text. See archived `study-notes` branch.
 
 ## Reference
 
@@ -247,7 +245,7 @@ python main.py --mock-llm         # 离线快速验证
 | Retention 信息保留率 | 70% | MiniLM 嵌入余弦相似度 | 记忆覆盖了原文中多少信息 |
 | Entity F1 实体覆盖 | 30% | spaCy NER 实体匹配 | 人名、数字、日期等关键事实是否丢失 |
 
-嵌入相似度是 3DrawAgent 中 CLIP 评分的文本类比——快（0.05 秒/次）、可解释。实体 F1 捕获嵌入遗漏的细节："订单 #88421" 变成 "订单" 时嵌入察觉不到但实体匹配能暴露差距。
+嵌入相似度测量记忆对原文每个事实句的语义覆盖程度——快（约 0.05 秒/次）、可解释、同一模型内语言无关。实体 F1 捕获嵌入遗漏的细节："订单 #88421" 变成 "订单" 时嵌入察觉不到但实体匹配能暴露差距。
 
 ## 核心机制
 
@@ -319,7 +317,6 @@ output/
 
 **支持哪些文件格式？** PDF、PPTX、DOCX、CSV、JSON、XML、TXT、MD，Web 界面拖拽上传自动提取文字。
 
-**能做上课笔记吗？** 可以，用 `--mode user` 输入 PPT/讲课文本即可。已归档的 `study-notes` 分支有专用模式。
 
 ## 参考
 
